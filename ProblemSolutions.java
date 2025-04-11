@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   Evan Bowser / 002
  *
  *   This java file contains the problem solutions for the methods selectionSort,
  *   mergeSortDivisibleByKFirst, asteroidsDestroyed, and numRescueCanoes methods.
@@ -38,9 +38,27 @@ public class ProblemSolutions {
 
         for (int i = 0; i < n - 1; i++) {
 
-            // YOU CODE GOES HERE -- COMPLETE THE INNER LOOP OF THIS
-            // "SELECTION SORT" ALGORITHM.
-            // DO NOT FORGET TO ADD YOUR NAME / SECTION ABOVE
+            int index = i;  // Assume current index holds the correct value
+
+        // Find the minimum or maximum element in the remaining subarray
+        for (int j = i + 1; j < n; j++) {
+            if (ascending) {
+                if (values[j] < values[index]) {
+                    index = j;
+                }
+            } else {
+                if (values[j] > values[index]) {
+                    index = j;
+                }
+            }
+        }
+
+        // Swap the found element into its correct position
+        if (index != i) {
+            int temp = values[i];
+            values[i] = values[index];
+            values[index] = temp;
+        }
 
         }
 
@@ -90,20 +108,62 @@ public class ProblemSolutions {
      * The merging portion of the merge sort, divisible by k first
      */
 
-    private void mergeDivisbleByKFirst(int arr[], int k, int left, int mid, int right)
-    {
-        // YOUR CODE GOES HERE, THIS METHOD IS NO MORE THAN THE STANDARD MERGE PORTION
-        // OF A MERGESORT, EXCEPT THE NUMBERS DIVISIBLE BY K MUST GO FIRST WITHIN THE
-        // SEQUENCE PER THE DISCUSSION IN THE PROLOGUE ABOVE.
-        //
-        // NOTE: YOU CAN PROGRAM THIS WITH A SPACE COMPLEXITY OF O(1) OR O(N LOG N).
-        // AGAIN, THIS IS REFERRING TO SPACE COMPLEXITY. O(1) IS IN-PLACE, O(N LOG N)
-        // ALLOCATES AUXILIARY DATA STRUCTURES (TEMPORARY ARRAYS). IT WILL BE EASIER
-        // TO CODE WITH A SPACE COMPLEXITY OF O(N LOG N), WHICH IS FINE FOR PURPOSES
-        // OF THIS PROGRAMMING EXERCISES.
-
-        return;
-
+     private void mergeDivisbleByKFirst(int arr[], int k, int left, int mid, int right) {
+        // Merges two sorted subarrays [left..mid] and [mid+1..right],
+        // ensuring elements divisible by k appear first (in original order).
+    
+        int[] temp = new int[right - left + 1]; // Temporary array to store merged result
+        int index = 0;
+    
+        int i = left;      // Pointer for left half
+        int j = mid + 1;   // Pointer for right half
+    
+        // Pass 1: Merge all elements divisible by k, preserving relative order
+        while (i <= mid && j <= right) {
+            boolean iDiv = arr[i] % k == 0;
+            boolean jDiv = arr[j] % k == 0;
+    
+            if (iDiv && jDiv) {
+                temp[index++] = arr[i++];
+            } else if (iDiv) {
+                temp[index++] = arr[i++];
+            } else if (jDiv) {
+                temp[index++] = arr[j++];
+            } else {
+                break; // Stop once both pointers hit non-divisible numbers
+            }
+        }
+    
+        // Collect remaining divisible elements from left side
+        while (i <= mid && arr[i] % k == 0) {
+            temp[index++] = arr[i++];
+        }
+    
+        // Collect remaining divisible elements from right side
+        while (j <= right && arr[j] % k == 0) {
+            temp[index++] = arr[j++];
+        }
+    
+        // Pass 2: Merge remaining (non-divisible) elements in sorted order
+        while (i <= mid && j <= right) {
+            if (arr[i] <= arr[j]) {
+                temp[index++] = arr[i++];
+            } else {
+                temp[index++] = arr[j++];
+            }
+        }
+    
+        // Append leftovers from either side
+        while (i <= mid) {
+            temp[index++] = arr[i++];
+        }
+    
+        while (j <= right) {
+            temp[index++] = arr[j++];
+        }
+    
+        // Copy merged content back into the original array segment
+        System.arraycopy(temp, 0, arr, left, temp.length);
     }
 
 
@@ -154,10 +214,22 @@ public class ProblemSolutions {
 
     public static boolean asteroidsDestroyed(int mass, int[] asteroids) {
 
-        // YOUR CODE GOES HERE, CONSIDER USING ARRAYS.SORT()
+        // Sort asteroids so we try to destroy smaller ones first
+        Arrays.sort(asteroids);
 
-        return false;
+    // Iterate through each asteroid
+        for (int i = 0; i < asteroids.length; i++) {
+        // If asteroid is too massive to destroy, return false immediately
+            if (mass < asteroids[i]) {
+            return false;
+            }
 
+        // Otherwise, destroy the asteroid and gain its mass
+        mass += asteroids[i];
+    }
+
+    // All asteroids successfully destroyed
+    return true;
     }
 
 
@@ -190,13 +262,31 @@ public class ProblemSolutions {
      * @return          - the minimum number of rescue sleds required to hold all people
      */
 
-    public static int numRescueSleds(int[] people, int limit) {
-
-        // YOUR CODE GOES HERE, CONSIDER USING ARRAYS.SORT
-
-        return -1;
-
+     public static int numRescueSleds(int[] people, int limit) {
+        // Calculates the minimum number of sleds needed to rescue everyone.
+        // Each sled can carry at most two people and cannot exceed the weight limit.
+    
+        Arrays.sort(people); // Sort people by weight (lightest to heaviest)
+    
+        int left = 0; // Pointer to the lightest person
+        int right = people.length - 1; // Pointer to the heaviest person
+        int sledCount = 0; // Total sleds used
+    
+        while (left <= right) {
+            // Try to pair the lightest and heaviest person together
+            if (people[left] + people[right] <= limit) {
+                left++; // Pair successful, move to next lightest person
+            }
+    
+            // In all cases, the heaviest person gets on a sled
+            right--;
+    
+            // One sled used in this iteration
+            sledCount++;
+        }
+    
+        return sledCount;
     }
+    
 
 } // End Class ProblemSolutions
-
